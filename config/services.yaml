@@ -22,6 +22,8 @@ services:
     # App\Command\ImportCommand:
     #     tags:
     #         - {name: 'console.command', command: 'app:import'}
+    App\EventListener\ConsoleErrorListener:
+        tags: [kernel.event_listener]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

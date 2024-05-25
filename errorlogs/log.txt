@@ -1,0 +1,14 @@
+InvalidArgumentException: The current node list is empty. in C:\KauflandCodingTask\vendor\symfony\dom-crawler\Crawler.php:485
+Stack trace:
+#0 C:\KauflandCodingTask\src\Service\XmlImportService.php(23): Symfony\Component\DomCrawler\Crawler->children()
+#1 C:\KauflandCodingTask\src\Command\ImportCommand.php(38): App\Service\XmlImportService->createEntities()
+#2 C:\KauflandCodingTask\vendor\symfony\console\Command\Command.php(279): App\Command\ImportCommand->execute()
+#3 C:\KauflandCodingTask\vendor\symfony\console\Application.php(1049): Symfony\Component\Console\Command\Command->run()
+#4 C:\KauflandCodingTask\vendor\symfony\framework-bundle\Console\Application.php(125): Symfony\Component\Console\Application->doRunCommand()
+#5 C:\KauflandCodingTask\vendor\symfony\console\Application.php(318): Symfony\Bundle\FrameworkBundle\Console\Application->doRunCommand()
+#6 C:\KauflandCodingTask\vendor\symfony\framework-bundle\Console\Application.php(79): Symfony\Component\Console\Application->doRun()
+#7 C:\KauflandCodingTask\vendor\symfony\console\Application.php(169): Symfony\Bundle\FrameworkBundle\Console\Application->doRun()
+#8 C:\KauflandCodingTask\vendor\symfony\runtime\Runner\Symfony\ConsoleApplicationRunner.php(49): Symfony\Component\Console\Application->run()
+#9 C:\KauflandCodingTask\vendor\autoload_runtime.php(29): Symfony\Component\Runtime\Runner\Symfony\ConsoleApplicationRunner->run()
+#10 C:\KauflandCodingTask\bin\console(15): require_once('...')
+#11 {main}app:import
