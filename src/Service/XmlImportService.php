@@ -20,11 +20,10 @@ class XmlImportService
 
         $inputFile = file_get_contents($path);
         $crawler = new Crawler($inputFile);
-        foreach($crawler->children()->first()->children() as $item)
+        foreach($crawler->children() as $item)
         {
             $article = new Article();
             $article->setEntityId(intval($item->childNodes->item(0)->textContent));
-            dd($item->childNodes->item(1));
             $article->setCategoryName($item->childNodes->item(1)->textContent);
             $article->setSku($item->childNodes->item(2)->textContent);
             $article->setName($item->childNodes->item(3)->textContent);
