@@ -16,11 +16,11 @@ class SqliteImportService
     /**
      * @param Article $entity
      */
-    public function persistEntities(array $entities)
+    public function persistEntities(array $entityBatches)
     {
-        foreach($entities as $entity)
+        foreach($entityBatches as $entityBatch)
         {
-            $this->articleRepository->add($entity, true);
+            $this->articleRepository->addBatch($entityBatch);
         }
     }
 }

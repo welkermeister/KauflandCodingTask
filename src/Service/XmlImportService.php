@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\DomCrawler\Crawler;
 use App\Entity\Article;
+use XMLReader;
 
 class XmlImportService
 {
@@ -16,34 +17,41 @@ class XmlImportService
 
     public function createEntities(string $path): array
     {
-        $items = [];
+        $batches = [];
 
-        $inputFile = file_get_contents($path);
-        $crawler = new Crawler($inputFile);
-        foreach($crawler->children() as $item)
+        $reader = new XMLReader();
+        $reader->open($path);
+
+        //find depth of items
+        while($reader->read() && $reader->name == 'item')
         {
-            $article = new Article();
-            $article->setEntityId(intval($item->childNodes->item(0)->textContent));
-            $article->setCategoryName($item->childNodes->item(1)->textContent);
-            $article->setSku($item->childNodes->item(2)->textContent);
-            $article->setName($item->childNodes->item(3)->textContent);
-            $article->setDescription($item->childNodes->item(4)->textContent);
-            $article->setShortdesc($item->childNodes->item(5)->textContent);
-            $article->setPrice(floatval($item->childNodes->item(6)->textContent));
-            $article->setLink($item->childNodes->item(7)->textContent);
-            $article->setImage($item->childNodes->item(8)->textContent);
-            $article->setBrand($item->childNodes->item(9)->textContent);
-            $article->setRating(intval($item->childNodes->item(10)->textContent));
-            $article->setCaffeineType($item->childNodes->item(11)->textContent);
-            $article->setCount(intval($item->childNodes->item(12)->textContent));
-            $article->setFlavored($item->childNodes->item(13)->textContent);
-            $article->setSeasonal($item->childNodes->item(14)->textContent);
-            $article->setInstock($item->childNodes->item(15)->textContent);
-            $article->setFacebook(boolval($item->childNodes->item(16)->textContent));
-            $article->setKCup(boolval($item->childNodes->item(17)->textContent));
+            $batch = [];
 
-            $items[] = $article;
+            //create entities and put in batches
+            while(sizeof($batch) <= 100 && $reader->next()) 
+            {
+                $article = new Article();
+                $article->setEntityId(intval($reader->getAttribute('entity_id')));
+                $article->setCategoryName($reader->getAttribute('CategoryName'));
+                $article->setSku($reader->getAttribute('sku'));
+                $article->setName($reader->getAttribute('name'));
+                $article->setDescription($reader->getAttribute('description'));
+                $article->setShortdesc($reader->getAttribute('shortdesc'));
+                $article->setPrice(floatval($reader->getAttribute('price')));
+                $article->setLink($reader->getAttribute('link'));
+                $article->setBrand($reader->getAttribute('Brand'));
+                $article->setRating(intval($reader->getAttribute('Rating')));
+                $article->setCaffeineType($reader->getAttribute('CaffeineType'));
+                $article->setCount(intval($reader->getAttribute('Count')));
+                $article->setFlavored($reader->getAttribute('Flavored'));
+                $article->setSeasonal($reader->getAttribute('Seasonal'));
+                $article->setInstock($reader->getAttribute('Instock'));
+                $article->setFacebook(boolval($reader->getAttribute('Facebook')));
+                $article->setKCup(boolval($reader->getAttribute('IsKCup')));
+                $batch[] = $article;
+            }
+            $batches[] = $batch;
         }
-        return $items;
+        return $batches;
     }
 }

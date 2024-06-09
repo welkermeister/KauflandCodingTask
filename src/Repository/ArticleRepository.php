@@ -26,6 +26,15 @@ class ArticleRepository extends ServiceEntityRepository
         }
     }
 
+    public function addBatch(array $articleBatch): void
+    {
+        foreach($articleBatch as $article)
+        {
+            $this->getEntityManager()->persist($article);
+        }
+        $this->getEntityManager()->flush();
+    }
+
     //    /**
     //     * @return Article[] Returns an array of Article objects
     //     */
