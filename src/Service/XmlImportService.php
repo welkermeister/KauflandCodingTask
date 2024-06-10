@@ -42,16 +42,20 @@ class XmlImportService
             
             if(sizeof($batch) <= 100 && str_contains($item, 'entity'))
             {
-                print($item);
                 $decodedArticle = [];
                 $decodedArticle = $serializer->decode($item, 'xml', ['as_collection' => true]);
                 $article = $this->normalize((array)$decodedArticle);
                 $batch[] = $article;
             } 
-            else 
+            else if (sizeof($batch) == 100)
             {
                 $batches[] = $batch;
                 $batch = [];
+            }
+            else
+            {
+                $batches[] = $batch;
+                break;
             }
 
         } while($reader->next());
@@ -77,6 +81,8 @@ class XmlImportService
         $article->setCaffeineType($decodedArticle['CaffeineType'][0]);
         $article->setCount(intval($decodedArticle['Count'][0]));
         $article->setFlavored($decodedArticle['Flavored'][0]);
+        $article->setSeasonal($decodedArticle['Seasonal'][0]);
+        $article->setInstock($decodedArticle['Instock'][0]);
         $article->setFacebook(boolval($decodedArticle['Facebook'][0]));
         $article->setKCup(boolval($decodedArticle['IsKCup'][0]));
         return $article;
