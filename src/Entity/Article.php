@@ -56,16 +56,16 @@ class Article
     #[ORM\Column(length: 3)]
     private ?string $Flavored = null;
 
-    #[ORM\Column(length: 3)]
+    #[ORM\Column(length: 3, nullable: true)]
     private ?string $Seasonal = null;
 
-    #[ORM\Column(length: 3)]
+    #[ORM\Column(length: 3, nullable: true)]
     private ?string $Instock = null;
 
     #[ORM\Column]
     private ?bool $Facebook = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $IsKCup = null;
 
     public function getId(): ?int
@@ -228,6 +228,7 @@ class Article
 
         return $this;
     }
+
 
     public function getFlavored(): ?string
     {

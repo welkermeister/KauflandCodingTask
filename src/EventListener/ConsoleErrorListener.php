@@ -11,8 +11,8 @@ class ConsoleErrorListener
         $filesystem = new Filesystem();
         $filesystem->dumpFile(
             'errorlogs/log.txt',
-            $event->getError() . 
-            $event->getCommand()->getName()
+            $event->getError()
+            // $event->getCommand()->getName()
         );
     }
 }

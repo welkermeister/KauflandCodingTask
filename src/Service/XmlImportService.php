@@ -2,7 +2,10 @@
 
 namespace App\Service;
 
-use Symfony\Component\DomCrawler\Crawler;
+use App\Repository\ArticleRepository;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use App\Entity\Article;
 use XMLReader;
 
@@ -17,41 +20,65 @@ class XmlImportService
 
     public function createEntities(string $path): array
     {
+        $encoders = [new XmlEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+
         $batches = [];
+        $batch = [];
 
         $reader = new XMLReader();
         $reader->open($path);
 
         //find depth of items
-        while($reader->read() && $reader->name == 'item')
-        {
-            $batch = [];
+        while($reader->read() && $reader->name !== 'item') {}
 
-            //create entities and put in batches
-            while(sizeof($batch) <= 100 && $reader->next()) 
+        //create entities and put in batches
+        do
+        {
+            
+            $item = $reader->readOuterXml();
+            
+            if(sizeof($batch) <= 100 && str_contains($item, 'entity'))
             {
-                $article = new Article();
-                $article->setEntityId(intval($reader->getAttribute('entity_id')));
-                $article->setCategoryName($reader->getAttribute('CategoryName'));
-                $article->setSku($reader->getAttribute('sku'));
-                $article->setName($reader->getAttribute('name'));
-                $article->setDescription($reader->getAttribute('description'));
-                $article->setShortdesc($reader->getAttribute('shortdesc'));
-                $article->setPrice(floatval($reader->getAttribute('price')));
-                $article->setLink($reader->getAttribute('link'));
-                $article->setBrand($reader->getAttribute('Brand'));
-                $article->setRating(intval($reader->getAttribute('Rating')));
-                $article->setCaffeineType($reader->getAttribute('CaffeineType'));
-                $article->setCount(intval($reader->getAttribute('Count')));
-                $article->setFlavored($reader->getAttribute('Flavored'));
-                $article->setSeasonal($reader->getAttribute('Seasonal'));
-                $article->setInstock($reader->getAttribute('Instock'));
-                $article->setFacebook(boolval($reader->getAttribute('Facebook')));
-                $article->setKCup(boolval($reader->getAttribute('IsKCup')));
+                print($item);
+                $decodedArticle = [];
+                $decodedArticle = $serializer->decode($item, 'xml', ['as_collection' => true]);
+                $article = $this->normalize((array)$decodedArticle);
                 $batch[] = $article;
+            } 
+            else 
+            {
+                $batches[] = $batch;
+                $batch = [];
             }
-            $batches[] = $batch;
-        }
+
+        } while($reader->next());
+
+        $reader->close();
         return $batches;
+    }
+
+    private function normalize(array $decodedArticle) 
+    {
+        $article = new Article();
+        $article->setEntityId(intval($decodedArticle['entity_id'][0]));
+        $article->setCategoryName($decodedArticle['CategoryName'][0]);
+        $article->setSku($decodedArticle['sku'][0]);
+        $article->setName($decodedArticle['name'][0]);
+        $article->setDescription($decodedArticle['description'][0]);
+        $article->setShortdesc($decodedArticle['shortdesc'][0]);
+        $article->setPrice(floatval($decodedArticle['price'][0]));
+        $article->setLink($decodedArticle['link'][0]);
+        $article->setImage($decodedArticle['image'][0]);
+        $article->setBrand($decodedArticle['Brand'][0]);
+        $article->setRating(intval($decodedArticle['Rating'][0]));
+        $article->setCaffeineType($decodedArticle['CaffeineType'][0]);
+        $article->setCount(intval($decodedArticle['Count'][0]));
+        $article->setFlavored($decodedArticle['Flavored'][0]);
+        $article->setFacebook(boolval($decodedArticle['Facebook'][0]));
+        $article->setKCup(boolval($decodedArticle['IsKCup'][0]));
+        return $article;
     }
 }

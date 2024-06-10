@@ -19,7 +19,6 @@ class ImportCommand extends Command
     public function __construct(
         private XmlImportService $xmlImportService,
         private SqliteImportService $sqliteImportService,
-        private ErrorListenerService $errorListenerService,
     ) {
         parent::__construct();
     }
@@ -30,11 +29,14 @@ class ImportCommand extends Command
         $inputPath = $input->getArgument('path');
         $articles = [];
 
+        // conditional for potential input file formats
         switch($input->getOption('input-type'))
         {
             case 'xml':
                 $articles = $this->xmlImportService->createEntities($inputPath);
         }
+
+        // conditional for potential database types
         switch($input->getOption('db-type'))
         {
             case 'sqlite':
